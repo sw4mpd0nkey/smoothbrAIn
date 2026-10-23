@@ -6,17 +6,17 @@ type BPETokenizer struct {
 	corpus   string
 	wordFreq map[string]int
 	alphabet map[rune]int
+	pairs    map[string]int
 }
 
 func NewBPETokenizer(text string) *BPETokenizer {
 	return &BPETokenizer{
-		corpus:   text,
-		wordFreq: make(map[string]int),
-		alphabet: make(map[rune]int),
+		corpus: text,
 	}
 }
 
 func (tokenizer *BPETokenizer) ComputeWordFreq() {
+	tokenizer.wordFreq = make(map[string]int)
 	words := strings.Split(tokenizer.corpus, " ")
 
 	for _, word := range words {
@@ -25,6 +25,7 @@ func (tokenizer *BPETokenizer) ComputeWordFreq() {
 }
 
 func (tokenizer *BPETokenizer) CopmuteBaseVocabulary() {
+	tokenizer.alphabet = make(map[rune]int)
 	for word := range tokenizer.wordFreq {
 		for _, char := range word {
 			tokenizer.alphabet[char]++
