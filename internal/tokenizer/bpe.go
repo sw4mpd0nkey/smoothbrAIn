@@ -2,11 +2,16 @@ package tokenizer
 
 import "strings"
 
+type Pair struct {
+	A rune
+	B rune
+}
+
 type BPETokenizer struct {
 	corpus   string
 	wordFreq map[string]int
 	alphabet map[rune]int
-	pairs    map[string]int
+	Pairs    map[Pair]int
 }
 
 func NewBPETokenizer(text string) *BPETokenizer {
@@ -34,7 +39,39 @@ func (tokenizer *BPETokenizer) CopmuteBaseVocabulary() {
 }
 
 func (tokenizer *BPETokenizer) ComputePairFreq() {
+	splits := tokenizer.getSplits()
+	tokenizer.Pairs = make(map[Pair]int)
+	for word, _ := range tokenizer.wordFreq {
+		split := splits[word]
+		if len(split) == 1 {
+			continue
+		}
 
+		for i := range len(split) - 1 {
+			pair := Pair{
+				A: split[i],
+				B: split[i+1],
+			}
+			tokenizer.Pairs[pair]++
+		}
+
+	}
+}
+
+func (tokenizer *BPETokenizer) BuildVocabulary() {
+
+}
+
+// private funcs
+
+func (tokenizer *BPETokenizer) getSplits() map[string][]rune {
+	splits := make(map[string][]rune)
+
+	for word, _ := range tokenizer.wordFreq {
+		splits[word] = []rune(word)
+	}
+
+	return splits
 }
 
 // Following just stat funcs
