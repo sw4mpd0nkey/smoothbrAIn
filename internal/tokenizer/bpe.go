@@ -25,16 +25,14 @@ func (tokenizer *BPETokenizer) ComputeWordReq() {
 }
 
 func (tokenizer *BPETokenizer) CopmuteBaseVocabulary() {
-	alphabet := make(map[rune]int)
-
 	for word := range tokenizer.wordFreq {
 		for _, char := range word {
-			if _, ok := alphabet[char]; !ok {
-				alphabet[char] = 1
-			}
+			tokenizer.alphabet[char]++
 		}
 	}
 }
+
+// Following just stat funcs
 
 func (tokenizer *BPETokenizer) NumberOfWords() int {
 	return len(tokenizer.wordFreq)
