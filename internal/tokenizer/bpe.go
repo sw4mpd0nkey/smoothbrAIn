@@ -8,10 +8,11 @@ type Pair struct {
 }
 
 type BPETokenizer struct {
-	corpus   string
-	wordFreq map[string]int
-	alphabet map[rune]int
-	Pairs    map[Pair]int
+	corpus     string
+	wordFreq   map[string]int
+	alphabet   map[rune]int
+	Pairs      map[Pair]int
+	Vocabulary map[Pair]string
 }
 
 func NewBPETokenizer(text string) *BPETokenizer {
@@ -59,6 +60,22 @@ func (tokenizer *BPETokenizer) ComputePairFreq() {
 }
 
 func (tokenizer *BPETokenizer) BuildVocabulary() {
+
+	tokenizer.Vocabulary = make(map[Pair]string)
+
+	best_pair := Pair{}
+	max := 0
+	combo := ""
+
+	for pair, freq := range tokenizer.Pairs {
+		if max < freq {
+			best_pair = pair
+			max = freq
+			combo = string(pair.A + pair.B)
+		}
+	}
+
+	tokenizer.Vocabulary[best_pair] = combo
 
 }
 
