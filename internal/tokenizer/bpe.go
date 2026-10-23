@@ -16,7 +16,7 @@ func NewBPETokenizer(text string) *BPETokenizer {
 	}
 }
 
-func (tokenizer *BPETokenizer) ComputeWordReq() {
+func (tokenizer *BPETokenizer) ComputeWordFreq() {
 	words := strings.Split(tokenizer.corpus, " ")
 
 	for _, word := range words {
@@ -30,6 +30,10 @@ func (tokenizer *BPETokenizer) CopmuteBaseVocabulary() {
 			tokenizer.alphabet[char]++
 		}
 	}
+}
+
+func (tokenizer *BPETokenizer) ComputePairFreq() {
+
 }
 
 // Following just stat funcs

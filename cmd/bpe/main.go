@@ -12,7 +12,7 @@ func main() {
 
 	tokenizer := tokenizer.NewBPETokenizer(text)
 
-	tokenizer.ComputeWordReq()
+	tokenizer.ComputeWordFreq()
 	fmt.Printf("===> We rocking with %d words\n", tokenizer.NumberOfWords())
 
 	tokenizer.CopmuteBaseVocabulary()
