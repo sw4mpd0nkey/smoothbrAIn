@@ -1,57 +1,45 @@
 package tokenizer
 
-type Pair struct {
-	A int
-	B int
-}
-
-type Merge struct {
-	pair   Pair
-	second int
-}
+import "strings"
 
 type BPETokenizer struct {
-	corpus string
+	corpus   string
+	wordFreq map[string]int
+	alphabet map[rune]int
 }
 
-func newBPE(text string) *BPETokenizer {
+func NewBPETokenizer(text string) *BPETokenizer {
 	return &BPETokenizer{
-		corpus: text,
+		corpus:   text,
+		wordFreq: make(map[string]int),
+		alphabet: make(map[rune]int),
 	}
 }
 
-func (bpe *BPETokenizer) mergre(ids []int, pair Pair, idx int) []int {
-	newIds := make([]int, 0)
-	i := 0
-	for i < len(ids) {
-		if i < len(ids)-1 && ids[i] == pair.A && ids[i+1] == pair.B {
-			newIds = append(newIds, idx)
-			i += 2
-		} else {
-			newIds = append(newIds, ids[i])
-			i += 1
+func (tokenizer *BPETokenizer) ComputeWordReq() {
+	words := strings.Split(tokenizer.corpus, " ")
+
+	for _, word := range words {
+		tokenizer.wordFreq[word]++
+	}
+}
+
+func (tokenizer *BPETokenizer) CopmuteBaseVocabulary() {
+	alphabet := make(map[rune]int)
+
+	for word := range tokenizer.wordFreq {
+		for _, char := range word {
+			if _, ok := alphabet[char]; !ok {
+				alphabet[char] = 1
+			}
 		}
 	}
-	return newIds
 }
 
-func (bpe *BPETokenizer) getStats(tokens []int) map[Pair]int {
-	counts := make(map[Pair]int)
-	for i := 0; i < len(tokens)-1; i++ {
-		counts[Pair{tokens[i], tokens[i+1]}] += 1
-	}
-	return counts
+func (tokenizer *BPETokenizer) NumberOfWords() int {
+	return len(tokenizer.wordFreq)
 }
 
-func (bpe *BPETokenizer) findMostCommonPair(tokens []int) Pair {
-	counts := bpe.getStats(tokens)
-	mostCommon := Pair{}
-	maxCount := -1
-	for k, v := range counts {
-		if v > maxCount {
-			maxCount = v
-			mostCommon = k
-		}
-	}
-	return mostCommon
+func (tokenizer *BPETokenizer) NumberUniqueChars() int {
+	return len(tokenizer.alphabet)
 }

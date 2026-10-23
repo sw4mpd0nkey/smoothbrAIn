@@ -1,3 +1,3 @@
-module github.com/sw4mpd0nkey/m/v2
+module github.com/sw4mpd0nkey/smoothbrain
 
 go 1.27.3
