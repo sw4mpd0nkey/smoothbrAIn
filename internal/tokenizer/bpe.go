@@ -1,10 +1,13 @@
 package tokenizer
 
-import "strings"
+import (
+	"slices"
+	"strings"
+)
 
 type Pair struct {
-	A rune
-	B rune
+	A string
+	B string
 }
 
 type BPETokenizer struct {
@@ -42,7 +45,7 @@ func (tokenizer *BPETokenizer) CopmuteBaseVocabulary() {
 func (tokenizer *BPETokenizer) ComputePairFreq() {
 	splits := tokenizer.getSplits()
 	tokenizer.Pairs = make(map[Pair]int)
-	for word, _ := range tokenizer.wordFreq {
+	for word := range tokenizer.wordFreq {
 		split := splits[word]
 		if len(split) == 1 {
 			continue
@@ -71,7 +74,7 @@ func (tokenizer *BPETokenizer) BuildVocabulary() {
 		if max < freq {
 			best_pair = pair
 			max = freq
-			combo = string(pair.A + pair.B)
+			combo = string(pair.A) + string(pair.B)
 		}
 	}
 
@@ -79,13 +82,46 @@ func (tokenizer *BPETokenizer) BuildVocabulary() {
 
 }
 
-// private funcs
-
-func (tokenizer *BPETokenizer) getSplits() map[string][]rune {
-	splits := make(map[string][]rune)
+func (tokenizer *BPETokenizer) mergePair(a, b string) map[string][]string {
+	splits := tokenizer.getSplits()
 
 	for word, _ := range tokenizer.wordFreq {
-		splits[word] = []rune(word)
+		split := splits[word]
+		if len(split) == 1 {
+			continue
+		}
+
+		for i := 0; i < len(split)-1; {
+			if split[i] == a && split[i+1] == b {
+				combo := a + b
+				left := split[:i]
+				right := split[i+2:]
+
+				split = slices.Concat(left, []string{combo}, right)
+
+			} else {
+				i += 1
+			}
+			splits[word] = split
+		}
+
+	}
+
+	return splits
+}
+
+// private funcs
+
+func (tokenizer *BPETokenizer) getSplits() map[string][]string {
+	splits := make(map[string][]string)
+
+	for word, _ := range tokenizer.wordFreq {
+		rune_array := []rune(word)
+		string_array := make([]string, len(rune_array))
+		for letter := range rune_array {
+			string_array = append(string_array, string(letter))
+		}
+		splits[word] = string_array
 	}
 
 	return splits
