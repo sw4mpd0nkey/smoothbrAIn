@@ -1,6 +1,7 @@
 package tokenizer
 
 import (
+	"fmt"
 	"slices"
 	"strings"
 )
@@ -24,62 +25,32 @@ func NewBPETokenizer(text string) *BPETokenizer {
 	}
 }
 
-func (tokenizer *BPETokenizer) ComputeWordFreq() {
-	tokenizer.wordFreq = make(map[string]int)
-	words := strings.Split(tokenizer.corpus, " ")
+func (tokenizer *BPETokenizer) Init() {
 
-	for _, word := range words {
-		tokenizer.wordFreq[word]++
+	tokenizer.computeWordFreq()
+	fmt.Printf("===> We rocking with %d words\n", tokenizer.numberOfWords())
+	fmt.Printf("\n\n")
+
+	tokenizer.copmuteBaseVocabulary()
+	fmt.Printf("===> %d unique characters in total corpus\n", tokenizer.numberUniqueChars())
+	fmt.Printf("\n\n")
+
+	tokenizer.computePairFreq()
+	fmt.Printf("===> Let's check our Pairs...\n")
+
+	for pair, count := range tokenizer.Pairs {
+		fmt.Printf("(%c,%c): %d\n", pair.A, pair.B, count)
 	}
+	fmt.Printf("\n\n")
 }
 
-func (tokenizer *BPETokenizer) CopmuteBaseVocabulary() {
-	tokenizer.alphabet = make(map[rune]int)
-	for word := range tokenizer.wordFreq {
-		for _, char := range word {
-			tokenizer.alphabet[char]++
-		}
+func (tokenizer *BPETokenizer) TrainBPE() {
+	tokenizer.buildVocabulary()
+	fmt.Printf("===> Now lets pump our vocab fam:\n")
+	for pair, token := range tokenizer.Vocabulary {
+		fmt.Printf("(%c,%c): %s", pair.A, pair.B, token)
 	}
-}
-
-func (tokenizer *BPETokenizer) ComputePairFreq() {
-	splits := tokenizer.getSplits()
-	tokenizer.Pairs = make(map[Pair]int)
-	for word := range tokenizer.wordFreq {
-		split := splits[word]
-		if len(split) == 1 {
-			continue
-		}
-
-		for i := range len(split) - 1 {
-			pair := Pair{
-				A: split[i],
-				B: split[i+1],
-			}
-			tokenizer.Pairs[pair]++
-		}
-
-	}
-}
-
-func (tokenizer *BPETokenizer) BuildVocabulary() {
-
-	tokenizer.Vocabulary = make(map[Pair]string)
-
-	best_pair := Pair{}
-	max := 0
-	combo := ""
-
-	for pair, freq := range tokenizer.Pairs {
-		if max < freq {
-			best_pair = pair
-			max = freq
-			combo = string(pair.A) + string(pair.B)
-		}
-	}
-
-	tokenizer.Vocabulary[best_pair] = combo
-
+	fmt.Printf("\n\n")
 }
 
 func (tokenizer *BPETokenizer) mergePair(a, b string) map[string][]string {
@@ -110,6 +81,10 @@ func (tokenizer *BPETokenizer) mergePair(a, b string) map[string][]string {
 	return splits
 }
 
+func (tokenizer *BPETokenizer) Tokenize() {
+
+}
+
 // private funcs
 
 func (tokenizer *BPETokenizer) getSplits() map[string][]string {
@@ -127,12 +102,70 @@ func (tokenizer *BPETokenizer) getSplits() map[string][]string {
 	return splits
 }
 
+func (tokenizer *BPETokenizer) computeWordFreq() {
+	tokenizer.wordFreq = make(map[string]int)
+	words := strings.Split(tokenizer.corpus, " ")
+
+	for _, word := range words {
+		tokenizer.wordFreq[word]++
+	}
+}
+
+func (tokenizer *BPETokenizer) computePairFreq() {
+	splits := tokenizer.getSplits()
+	tokenizer.Pairs = make(map[Pair]int)
+	for word := range tokenizer.wordFreq {
+		split := splits[word]
+		if len(split) == 1 {
+			continue
+		}
+
+		for i := range len(split) - 1 {
+			pair := Pair{
+				A: split[i],
+				B: split[i+1],
+			}
+			tokenizer.Pairs[pair]++
+		}
+
+	}
+}
+
+func (tokenizer *BPETokenizer) copmuteBaseVocabulary() {
+	tokenizer.alphabet = make(map[rune]int)
+	for word := range tokenizer.wordFreq {
+		for _, char := range word {
+			tokenizer.alphabet[char]++
+		}
+	}
+}
+
+func (tokenizer *BPETokenizer) buildVocabulary() {
+
+	tokenizer.Vocabulary = make(map[Pair]string)
+
+	best_pair := Pair{}
+	max := 0
+	combo := ""
+
+	for pair, freq := range tokenizer.Pairs {
+		if max < freq {
+			best_pair = pair
+			max = freq
+			combo = string(pair.A) + string(pair.B)
+		}
+	}
+
+	tokenizer.Vocabulary[best_pair] = combo
+
+}
+
 // Following just stat funcs
 
-func (tokenizer *BPETokenizer) NumberOfWords() int {
+func (tokenizer *BPETokenizer) numberOfWords() int {
 	return len(tokenizer.wordFreq)
 }
 
-func (tokenizer *BPETokenizer) NumberUniqueChars() int {
+func (tokenizer *BPETokenizer) numberUniqueChars() int {
 	return len(tokenizer.alphabet)
 }

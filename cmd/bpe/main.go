@@ -12,21 +12,7 @@ func main() {
 
 	tokenizer := tokenizer.NewBPETokenizer(text)
 
-	tokenizer.ComputeWordFreq()
-	fmt.Printf("===> We rocking with %d words\n", tokenizer.NumberOfWords())
-	fmt.Printf("\n\n")
-
-	tokenizer.CopmuteBaseVocabulary()
-	fmt.Printf("===> %d unique characters in total corpus\n", tokenizer.NumberUniqueChars())
-	fmt.Printf("\n\n")
-
-	tokenizer.ComputePairFreq()
-	fmt.Printf("===> Let's check our Pairs...\n")
-
-	for pair, count := range tokenizer.Pairs {
-		fmt.Printf("(%c,%c): %d\n", pair.A, pair.B, count)
-	}
-	fmt.Printf("\n\n")
+	tokenizer.Init()
 
 	tokenizer.BuildVocabulary()
 	fmt.Printf("===> Now lets pump our vocab fam:\n")
