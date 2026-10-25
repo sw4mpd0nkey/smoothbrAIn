@@ -13,18 +13,19 @@ type Pair struct {
 }
 
 type BPETokenizer struct {
-	maxMerges  int
+	vocabSize  int
 	corpus     string
 	wordFreq   map[string]int
 	alphabet   map[rune]int
 	pairs      map[Pair]int
 	vocabulary map[Pair]string
+	splits     map[string][]rune
 }
 
 func NewBPETokenizer(text string) *BPETokenizer {
 
 	return &BPETokenizer{
-		maxMerges: 1000,
+		vocabSize: 50,
 		corpus:    text,
 	}
 }
@@ -38,6 +39,9 @@ func (tokenizer *BPETokenizer) Init() {
 	fmt.Printf("===> %d unique characters in total corpus\n", tokenizer.numberUniqueChars())
 	fmt.Printf("\n\n")
 
+	tokenizer.generateSplits()
+	fmt.Printf("===> Generated word splits\n\n")
+
 	tokenizer.computePairFreq()
 	fmt.Printf("===> Let's check our Pairs...\n")
 
@@ -45,57 +49,28 @@ func (tokenizer *BPETokenizer) Init() {
 		fmt.Printf("(%s,%s): %d\n", string(pair.A), string(pair.B), count)
 	}
 	fmt.Printf("\n\n")
+
 }
 
 func (tokenizer *BPETokenizer) TrainBPE() {
 
-	wordSplits := tokenizer.getSplits()
-
-	for step := 0; step < tokenizer.maxMerges; step++ {
-		fmt.Println(wordSplits)
+	for step := 0; step < tokenizer.vocabSize; step++ {
+		tokenizer.computePairFreq()
+		bestPair := tokenizer.findBestPair()
+		tokenizer.mergePair(bestPair)
+		tokenizer.vocabulary[bestPair] = string(bestPair.A) + string(bestPair.B)
 	}
 
 }
 
-/*
-func (tokenizer *BPETokenizer) mergePair(a, b rune) map[string][]string {
-	splits := tokenizer.getSplits()
-
-	for word := range tokenizer.wordFreq {
-		split := splits[word]
-		if len(split) == 1 {
-			continue
-		}
-
-		for i := 0; i < len(split)-1; {
-			if split[i] == a && split[i+1] == b {
-				combo := string(a) + string(b)
-				left := split[:i]
-				right := split[i+2:]
-
-				split = slices.Concat(left, []string{combo}, right)
-
-			} else {
-				i += 1
-			}
-			splits[word] = split
-		}
-
-	}
-
-	return splits
-} */
-
 // private funcs
 
-func (tokenizer *BPETokenizer) getSplits() map[string][]rune {
-	splits := make(map[string][]rune)
+func (tokenizer *BPETokenizer) generateSplits() {
+	tokenizer.splits = make(map[string][]rune)
 
-	for word, _ := range tokenizer.wordFreq {
-		splits[word] = []rune(word)
+	for word := range tokenizer.wordFreq {
+		tokenizer.splits[word] = []rune(word)
 	}
-
-	return splits
 }
 
 func (tokenizer *BPETokenizer) computeWordFreq() {
@@ -108,11 +83,10 @@ func (tokenizer *BPETokenizer) computeWordFreq() {
 }
 
 func (tokenizer *BPETokenizer) computePairFreq() {
-	splits := tokenizer.getSplits()
 	tokenizer.pairs = make(map[Pair]int)
 
 	for word := range tokenizer.wordFreq {
-		split := splits[word]
+		split := tokenizer.splits[word]
 
 		if len(split) == 1 {
 			continue
@@ -138,24 +112,37 @@ func (tokenizer *BPETokenizer) copmuteBaseVocabulary() {
 	}
 }
 
-func (tokenizer *BPETokenizer) buildVocabulary() {
-
-	tokenizer.vocabulary = make(map[Pair]string)
+func (tokenizer *BPETokenizer) findBestPair() Pair {
 
 	best_pair := Pair{}
 	max := 0
-	combo := ""
 
 	for pair, freq := range tokenizer.pairs {
 		if max < freq {
 			best_pair = pair
 			max = freq
-			combo = string(pair.A) + string(pair.B)
 		}
 	}
 
-	tokenizer.vocabulary[best_pair] = combo
+	return best_pair
 
+}
+
+func (tokenizer *BPETokenizer) mergePair(pair Pair) {
+
+	for word := range tokenizer.wordFreq {
+
+		split := tokenizer.splits[word]
+		if len(split) == 1 {
+			continue
+		}
+
+		for i := 1; i < len(split)-1; {
+			if split[i] == pair.A && split[i+1] == pair.B {
+
+			}
+		}
+	}
 }
 
 // Following just stat funcs
