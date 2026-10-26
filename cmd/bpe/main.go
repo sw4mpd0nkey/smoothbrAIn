@@ -14,4 +14,6 @@ func main() {
 
 	tokenizer.Init()
 
+	tokenizer.TrainBPE()
+
 }
