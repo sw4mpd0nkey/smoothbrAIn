@@ -9,6 +9,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/sw4mpd0nkey/smoothbrain/internal/config"
 )
 
 func main() {
@@ -37,7 +39,12 @@ func run(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("get working directory: %w", err)
 	}
-	fmt.Println(workingDirectory)
+
+	appConfig, err := config.Load(workingDirectory)
+	if err != nil {
+		return fmt.Errorf("load configuration: %w", err)
+	}
+	fmt.Println(appConfig)
 
 	return nil
 }
