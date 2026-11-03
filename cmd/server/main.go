@@ -7,11 +7,13 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
 	"github.com/sw4mpd0nkey/smoothbrain/internal/config"
 	"github.com/sw4mpd0nkey/smoothbrain/internal/database"
+	logging "github.com/sw4mpd0nkey/smoothbrain/internal/logger"
 )
 
 func main() {
@@ -54,6 +56,12 @@ func run(ctx context.Context) error {
 	if err := database.Migrate(ctx, databaseConnection); err != nil {
 		return err
 	}
+
+	appLogger, err := logging.Open(filepath.Join(workingDirectory, "data", "bearly-secure.log"))
+	if err != nil {
+		return err
+	}
+	defer appLogger.Close()
 
 	return nil
 }
