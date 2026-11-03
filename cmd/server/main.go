@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/sw4mpd0nkey/smoothbrain/internal/config"
+	"github.com/sw4mpd0nkey/smoothbrain/internal/database"
 )
 
 func main() {
@@ -44,7 +45,15 @@ func run(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("load configuration: %w", err)
 	}
-	fmt.Println(appConfig)
+
+	databaseConnection, err := database.Open(ctx, appConfig.DatabasePath)
+	if err != nil {
+		return err
+	}
+	defer databaseConnection.Close()
+	if err := database.Migrate(ctx, databaseConnection); err != nil {
+		return err
+	}
 
 	return nil
 }
