@@ -2,7 +2,7 @@ package tokenizer
 
 import (
 	"fmt"
-	"strings"
+	"regexp"
 )
 
 type WordTokenizer struct {
@@ -17,9 +17,10 @@ func NewWordTokenizer(text string) *WordTokenizer {
 }
 
 func (word *WordTokenizer) BuildVocabulary() {
-
-	word.preprocessed = strings.Split(word.text, " ")
+	splitter := regexp.MustCompile(`(\s)`)
+	word.preprocessed = splitter.Split(word.text, -1)
 	for w := range word.preprocessed {
 		fmt.Printf("%s\n", word.preprocessed[w])
+
 	}
 }
