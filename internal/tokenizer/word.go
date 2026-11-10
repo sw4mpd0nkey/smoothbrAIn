@@ -18,9 +18,19 @@ func NewWordTokenizer(text string) *WordTokenizer {
 
 func (word *WordTokenizer) BuildVocabulary() {
 	splitter := regexp.MustCompile(`(\s)`)
-	word.preprocessed = splitter.Split(word.text, -1)
-	for w := range word.preprocessed {
-		fmt.Printf("%s\n", word.preprocessed[w])
-
+	specialChar := regexp.MustCompile(`([.,?!])`)
+	inFlight := splitter.Split(word.text, -1)
+	for _, w := range inFlight {
+		if specialChar.Match([]byte(w)) {
+			word.preprocessed = append(word.preprocessed, specialChar.Split(w, -1)[0])
+			word.preprocessed = append(word.preprocessed, specialChar.FindString(w))
+		} else {
+			word.preprocessed = append(word.preprocessed, w)
+		}
 	}
+
+	for _, w := range word.preprocessed {
+		fmt.Printf("%s\n", w)
+	}
+
 }
