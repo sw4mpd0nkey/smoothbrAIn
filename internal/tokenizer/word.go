@@ -9,6 +9,7 @@ import (
 type WordTokenizer struct {
 	text         string
 	preprocessed []string
+	vocabulary   []string
 }
 
 func NewWordTokenizer(text string) *WordTokenizer {
@@ -19,7 +20,7 @@ func NewWordTokenizer(text string) *WordTokenizer {
 
 func (word *WordTokenizer) BuildVocabulary() {
 	splitter := regexp.MustCompile(`(\s)`)
-	specialChar := regexp.MustCompile(`([.,?!])`)
+	specialChar := regexp.MustCompile(`([.,?!"':;\-_])`)
 
 	// initial split on white space
 	inFlight := splitter.Split(word.text, -1)
@@ -33,6 +34,8 @@ func (word *WordTokenizer) BuildVocabulary() {
 		}
 	}
 
+	// print out preprocessed
+	fmt.Println("===> All words and special characters:")
 	for _, w := range word.preprocessed {
 		fmt.Printf("%s\n", w)
 	}
