@@ -3,13 +3,14 @@ package tokenizer
 import (
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 )
 
 type WordTokenizer struct {
 	text         string
 	preprocessed []string
-	vocabulary   []string
+	vocabulary   map[string]int
 }
 
 func NewWordTokenizer(text string) *WordTokenizer {
@@ -38,6 +39,25 @@ func (word *WordTokenizer) BuildVocabulary() {
 	fmt.Println("===> All words and special characters:")
 	for _, w := range word.preprocessed {
 		fmt.Printf("%s\n", w)
+	}
+
+	sort.Slice(word.preprocessed, func(i, j int) bool {
+		return word.preprocessed[i] < word.preprocessed[j]
+	})
+
+	word.vocabulary = make(map[string]int)
+	vocabCounter := 0
+	for _, w := range word.preprocessed {
+
+		if _, exists := word.vocabulary[w]; !exists {
+			word.vocabulary[w] = vocabCounter
+			vocabCounter++
+		}
+	}
+
+	fmt.Println("===> Vocabulary build:")
+	for key, n := range word.vocabulary {
+		fmt.Printf("('%s' : %d)\n", key, n)
 	}
 
 }
