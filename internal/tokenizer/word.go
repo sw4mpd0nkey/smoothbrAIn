@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+var splitter = regexp.MustCompile(`(\s)`)
+var specialChar = regexp.MustCompile(`([.,?!"':;\-_])`)
+
 type WordTokenizer struct {
 	text         string
 	preprocessed []string
@@ -20,9 +23,6 @@ func NewWordTokenizer(text string) *WordTokenizer {
 }
 
 func (word *WordTokenizer) BuildVocabulary() {
-
-	splitter := regexp.MustCompile(`(\s)`)
-	specialChar := regexp.MustCompile(`([.,?!"':;\-_])`)
 
 	// initial split on white space
 	inFlight := splitter.Split(word.text, -1)
@@ -63,18 +63,54 @@ func (word *WordTokenizer) BuildVocabulary() {
 
 }
 
-func (w *WordTokenizer) Encode(text string) []int {
+func (word *WordTokenizer) Encode(text string) []int {
 	toReturn := []int{}
+	wordArray := []string{}
+
+	// initial split on white space
+	inFlight := splitter.Split(text, -1)
+	// additional processing for special characters, also removes any additional whitespace
+	for _, w := range inFlight {
+		if specialChar.Match([]byte(w)) {
+			wordArray = append(wordArray, trimAllSpace(specialChar.Split(w, -1)[0]))
+			wordArray = append(wordArray, trimAllSpace(specialChar.FindString(w)))
+		} else {
+			wordArray = append(wordArray, trimAllSpace(w))
+		}
+	}
+
+	for _, w := range wordArray {
+
+		if _, exists := word.vocabulary[w]; exists {
+			toReturn = append(toReturn, word.vocabulary[w])
+		} else {
+			toReturn = append(toReturn, -1)
+		}
+	}
 
 	return toReturn
 }
 
-func (w *WordTokenizer) Decode(ids []int) string {
+func (word *WordTokenizer) Decode(ids []int) string {
 	toReturn := ""
+
+	for i := range ids {
+		toReturn = toReturn + " " + mapLookUp(i, word.vocabulary)
+	}
 
 	return toReturn
 }
 
 func trimAllSpace(s string) string {
 	return strings.Join(strings.Fields(s), " ")
+}
+
+func mapLookUp(myValue int, m map[string]int) string {
+	for key, value := range m {
+		if value == myValue {
+			return key
+		}
+	}
+
+	return ""
 }
