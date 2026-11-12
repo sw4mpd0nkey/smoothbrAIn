@@ -10,6 +10,9 @@ import (
 var splitter = regexp.MustCompile(`(\s)`)
 var specialChar = regexp.MustCompile(`([.,?!"':;\-_])`)
 
+var unkownToken = "<|unk|>"
+var eot = "<|endoftext|>"
+
 type WordTokenizer struct {
 	text         string
 	preprocessed []string
@@ -56,6 +59,10 @@ func (word *WordTokenizer) BuildVocabulary() {
 		}
 	}
 
+	word.vocabulary[unkownToken] = vocabCounter
+	vocabCounter++
+	word.vocabulary[eot] = vocabCounter
+
 	fmt.Println("===> Vocabulary build:")
 	for key, n := range word.vocabulary {
 		fmt.Printf("('%s' : %d)\n", key, n)
@@ -84,7 +91,7 @@ func (word *WordTokenizer) Encode(text string) []int {
 		if _, exists := word.vocabulary[w]; exists {
 			toReturn = append(toReturn, word.vocabulary[w])
 		} else {
-			toReturn = append(toReturn, -1)
+			toReturn = append(toReturn, word.vocabulary[unkownToken])
 		}
 	}
 
@@ -112,5 +119,5 @@ func mapLookUp(myValue int, m map[string]int) string {
 		}
 	}
 
-	return ""
+	return unkownToken
 }
