@@ -15,9 +15,12 @@ func main() {
 	tokenizer.BuildVocabulary()
 
 	jimmy := tokenizer.Encode(text)
-	fmt.Println("===> encoding same text with vocabulary looks like:")
+	fmt.Println("===> encoding same text with vocabulary:")
 	for i := range jimmy {
 		fmt.Printf("%d\n", jimmy[i])
 	}
 
+	timmy := tokenizer.Decode(jimmy)
+	fmt.Println("===> decoding returned int array back to words (hopefully):")
+	fmt.Println(timmy)
 }
