@@ -19,7 +19,8 @@ func NewWordTokenizer(text string) *WordTokenizer {
 	}
 }
 
-func (word *WordTokenizer) Encode() {
+func (word *WordTokenizer) BuildVocabulary() {
+
 	splitter := regexp.MustCompile(`(\s)`)
 	specialChar := regexp.MustCompile(`([.,?!"':;\-_])`)
 
@@ -60,6 +61,18 @@ func (word *WordTokenizer) Encode() {
 		fmt.Printf("('%s' : %d)\n", key, n)
 	}
 
+}
+
+func (w *WordTokenizer) Encode(text string) []int {
+	toReturn := []int{}
+
+	return toReturn
+}
+
+func (w *WordTokenizer) Decode(ids []int) string {
+	toReturn := ""
+
+	return toReturn
 }
 
 func trimAllSpace(s string) string {
