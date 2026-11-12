@@ -12,6 +12,6 @@ func main() {
 
 	tokenizer := tokenizer.NewWordTokenizer(text)
 
-	tokenizer.BuildVocabulary()
+	tokenizer.Encode()
 
 }

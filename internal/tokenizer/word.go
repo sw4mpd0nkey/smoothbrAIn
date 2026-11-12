@@ -19,7 +19,7 @@ func NewWordTokenizer(text string) *WordTokenizer {
 	}
 }
 
-func (word *WordTokenizer) BuildVocabulary() {
+func (word *WordTokenizer) Encode() {
 	splitter := regexp.MustCompile(`(\s)`)
 	specialChar := regexp.MustCompile(`([.,?!"':;\-_])`)
 
