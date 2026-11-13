@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/sw4mpd0nkey/smoothbrain/internal/config"
 	"github.com/sw4mpd0nkey/smoothbrain/internal/database"
+	"github.com/sw4mpd0nkey/smoothbrain/internal/httpserver"
 	logging "github.com/sw4mpd0nkey/smoothbrain/internal/logger"
 )
 
@@ -57,11 +59,36 @@ func run(ctx context.Context) error {
 		return err
 	}
 
-	appLogger, err := logging.Open(filepath.Join(workingDirectory, "data", "bearly-secure.log"))
+	appLogger, err := logging.Open(filepath.Join(workingDirectory, "data", "smoothbrAIn.log"))
 	if err != nil {
 		return err
 	}
 	defer appLogger.Close()
 
-	return nil
+	application, err := httpserver.New(databaseConnection, appLogger, httpserver.Options{
+		AppOrigin:           appConfig.AppOrigin,
+		MaxRequestBodyBytes: appConfig.MaxRequestBodyBytes,
+		MaxUploadBytes:      appConfig.MaxUploadBytes,
+		DataDirectory:       filepath.Join(workingDirectory, "data"),
+		FixtureDirectory:    filepath.Join(workingDirectory, "data", "fixtures"),
+		TemplateDirectory:   filepath.Join(workingDirectory, "web", "templates"),
+		PublicDirectory:     filepath.Join(workingDirectory, "web", "public"),
+	})
+	if err != nil {
+		return err
+	}
+	defer application.Close()
+	applicationServer := httpserver.NewServer(fmt.Sprintf(":%d", appConfig.Port), application.Handler)
+	serverErrors := make(chan error, 1)
+	serve(applicationServer, fmt.Sprintf("smoothbrAIn is running at http://localhost:%d", appConfig.Port), serverErrors)
+
+	select {
+	case <-ctx.Done():
+		return shutdownServer(applicationServer)
+	case err := <-serverErrors:
+		if errors.Is(err, http.ErrServerClosed) {
+			return nil
+		}
+		return fmt.Errorf("serve HTTP server: %w", err)
+	}
 }

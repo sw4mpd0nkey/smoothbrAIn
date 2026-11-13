@@ -94,3 +94,7 @@ func newStaticHandler(publicRoot *os.Root) http.Handler {
 		fileServer.ServeHTTP(responseWriter, request)
 	})
 }
+
+func (application *Application) Close() error {
+	return application.publicRoot.Close()
+}
