@@ -102,7 +102,8 @@ func (word *WordTokenizer) Decode(ids []int) string {
 	toReturn := ""
 
 	for i := range ids {
-		toReturn = toReturn + " " + mapLookUp(i, word.vocabulary)
+		word := mapLookUp(ids[i], word.vocabulary)
+		toReturn = toReturn + " " + word
 	}
 
 	return toReturn
