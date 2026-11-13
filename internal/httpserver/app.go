@@ -54,7 +54,7 @@ func New(database *sql.DB, logger *logging.Logger, options Options) (*Applicatio
 	wordhandler := handlers.NewWordHandler(renderer, logger)
 
 	dynamicMux := http.NewServeMux()
-	dynamicMux.HandleFunc("GET /account", wordhandler.Page)
+	dynamicMux.HandleFunc("GET /word-tokenizer", wordhandler.Page)
 	dynamicHandler := permissiveCORS(dynamicMux)
 
 	mainMux := http.NewServeMux()

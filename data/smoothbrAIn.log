@@ -1,0 +1,1 @@
+{"event":"unhandled_error","message":"render account template: html/template: \"account\" is undefined","method":"GET","path":"/account","timestamp":"2026-11-13T03:05:19.304Z"}
