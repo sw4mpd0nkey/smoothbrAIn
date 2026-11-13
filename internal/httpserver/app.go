@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/sw4mpd0nkey/smoothbrain/internal/handlers"
 	"github.com/sw4mpd0nkey/smoothbrain/internal/httpx"
 	logging "github.com/sw4mpd0nkey/smoothbrain/internal/logger"
 	"github.com/sw4mpd0nkey/smoothbrain/internal/templates"
@@ -50,8 +51,10 @@ func New(database *sql.DB, logger *logging.Logger, options Options) (*Applicatio
 		return nil, fmt.Errorf("open public directory: %w", err)
 	}
 
-	dynamicMux := http.NewServeMux()
+	wordhandler := handlers.NewWordHandler(renderer, logger)
 
+	dynamicMux := http.NewServeMux()
+	dynamicMux.HandleFunc("GET /account", wordhandler.Page)
 	dynamicHandler := permissiveCORS(dynamicMux)
 
 	mainMux := http.NewServeMux()
