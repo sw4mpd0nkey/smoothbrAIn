@@ -1,1 +1,5 @@
 {"event":"unhandled_error","message":"render account template: html/template: \"account\" is undefined","method":"GET","path":"/account","timestamp":"2026-11-13T03:05:19.304Z"}
+{"event":"unhandled_error","message":"render account template: html/template: \"account\" is undefined","method":"GET","path":"/word-tokenizer","timestamp":"2026-11-14T00:41:42.954Z"}
+{"event":"unhandled_error","message":"render word template: html/template: \"word\" is undefined","method":"GET","path":"/word-tokenizer","timestamp":"2026-11-14T00:43:16.373Z"}
+{"event":"unhandled_error","message":"render word template: html/template: \"word\" is undefined","method":"GET","path":"/word-tokenizer","timestamp":"2026-11-14T00:43:17.545Z"}
+{"event":"unhandled_error","message":"render word template: html/template: \"word\" is undefined","method":"GET","path":"/word-tokenizer","timestamp":"2026-11-14T00:43:18.815Z"}

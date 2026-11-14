@@ -27,8 +27,6 @@ func Load(directoryPath string) (*Renderer, error) {
 	functions := template.FuncMap{
 		"documentTitle": documentTitle,
 		"money":         formatMoney,
-		"stars":         filledStars,
-		"emptyStars":    emptyStars,
 		"number":        formatNumber,
 		"multiply":      func(left, right int64) int64 { return left * right },
 	}
@@ -55,10 +53,10 @@ func (renderer *Renderer) Render(responseWriter http.ResponseWriter, statusCode 
 }
 
 func documentTitle(title string) string {
-	if title == "Bearly Secure" {
+	if title == "smoothbrAIn" {
 		return title
 	}
-	return title + " - Bearly Secure"
+	return title + " - smoothbrAIn"
 }
 
 func formatMoney(cents int64) string {
@@ -81,12 +79,4 @@ func formatNumber(value int64) string {
 		formatted = formatted[:index] + "," + formatted[index:]
 	}
 	return formatted
-}
-
-func filledStars(rating int64) string {
-	return strings.Repeat("★", int(rating))
-}
-
-func emptyStars(rating int64) string {
-	return strings.Repeat("☆", 5-int(rating))
 }

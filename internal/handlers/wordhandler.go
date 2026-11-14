@@ -29,7 +29,7 @@ func (handler *WordHandler) Page(responseWriter http.ResponseWriter, request *ht
 }
 
 func (handler *WordHandler) renderPage(responseWriter http.ResponseWriter, statusCode int, errorMessage string) error {
-	return handler.renderer.Render(responseWriter, statusCode, "account", pageView{
+	return handler.renderer.Render(responseWriter, statusCode, "word", pageView{
 		Title: "Word Tokenizer Example",
 		Error: errorMessage,
 	})
