@@ -26,7 +26,6 @@ type Renderer struct {
 func Load(directoryPath string) (*Renderer, error) {
 	functions := template.FuncMap{
 		"documentTitle": documentTitle,
-		"money":         formatMoney,
 		"number":        formatNumber,
 		"multiply":      func(left, right int64) int64 { return left * right },
 	}
@@ -57,16 +56,6 @@ func documentTitle(title string) string {
 		return title
 	}
 	return title + " - smoothbrAIn"
-}
-
-func formatMoney(cents int64) string {
-	absoluteCents := cents
-	prefix := "$"
-	if cents < 0 {
-		absoluteCents = -cents
-		prefix = "-$"
-	}
-	return fmt.Sprintf("%s%d.%02d", prefix, absoluteCents/100, absoluteCents%100)
 }
 
 func formatNumber(value int64) string {
