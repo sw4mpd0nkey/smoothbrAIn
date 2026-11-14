@@ -3,3 +3,5 @@
 {"event":"unhandled_error","message":"render word template: html/template: \"word\" is undefined","method":"GET","path":"/word-tokenizer","timestamp":"2026-11-14T00:43:16.373Z"}
 {"event":"unhandled_error","message":"render word template: html/template: \"word\" is undefined","method":"GET","path":"/word-tokenizer","timestamp":"2026-11-14T00:43:17.545Z"}
 {"event":"unhandled_error","message":"render word template: html/template: \"word\" is undefined","method":"GET","path":"/word-tokenizer","timestamp":"2026-11-14T00:43:18.815Z"}
+{"event":"unhandled_error","message":"render word template: html/template:word.html:3:11: no such template \"document-end\"","method":"GET","path":"/word-tokenizer","timestamp":"2026-11-14T00:59:23.500Z"}
+{"event":"unhandled_error","message":"render word template: html/template:word.html:3:11: no such template \"document-end\"","method":"GET","path":"/word-tokenizer","timestamp":"2026-11-14T01:01:30.121Z"}
