@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -55,6 +56,7 @@ func New(database *sql.DB, logger *logging.Logger, options Options) (*Applicatio
 
 	dynamicMux := http.NewServeMux()
 	dynamicMux.HandleFunc("GET /word-tokenizer", wordhandler.Page)
+	dynamicMux.Handle("POST /word-token", parseForm(options.MaxRequestBodyBytes, renderer)(http.HandlerFunc(wordhandler.EncodeText)))
 	dynamicHandler := permissiveCORS(dynamicMux)
 
 	mainMux := http.NewServeMux()
@@ -92,4 +94,26 @@ func newStaticHandler(publicRoot *os.Root) http.Handler {
 
 func (application *Application) Close() error {
 	return application.publicRoot.Close()
+}
+
+func parseForm(_ int64, renderer *templates.Renderer) middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
+			if err := request.ParseForm(); err != nil {
+				statusCode := http.StatusBadRequest
+				heading := "Invalid Request"
+				message := "The submitted form is invalid."
+				if _, ok := errors.AsType[*http.MaxBytesError](err); ok {
+					statusCode = http.StatusRequestEntityTooLarge
+					heading = "Content Too Large"
+					message = "The request body is too large."
+				}
+				if renderErr := httpx.RespondWithErrorPage(responseWriter, renderer, statusCode, heading, message); renderErr != nil {
+					http.Error(responseWriter, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				}
+				return
+			}
+			next.ServeHTTP(responseWriter, request)
+		})
+	}
 }
