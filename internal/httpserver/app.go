@@ -59,7 +59,7 @@ func New(database *sql.DB, logger *logging.Logger, options Options) (*Applicatio
 
 	mainMux := http.NewServeMux()
 	mainMux.HandleFunc("GET /health", func(responseWriter http.ResponseWriter, _ *http.Request) {
-		httpx.RespondWithJSON(responseWriter, http.StatusOK, map[string]any{"ok": true, "app": "bearly-secure"})
+		httpx.RespondWithJSON(responseWriter, http.StatusOK, map[string]any{"ok": true, "app": "smoothbrAIn"})
 	})
 	staticHandler := newStaticHandler(publicRoot)
 	mainMux.Handle("GET /reset.css", staticHandler)
